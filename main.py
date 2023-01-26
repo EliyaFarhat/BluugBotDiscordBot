@@ -279,13 +279,18 @@ async def testreact(interaction):
 
 
 @tree.command(name="hangman", description="Play some hangman :/.")
-async def hangman(interaction):
+async def hangman(interaction: discord.Interaction):
     words = ["🇦🇵🇵🇱🇪", "🇩🇮🇸🇨🇴🇷🇩", "🇫🇴🇷🇹🇳🇮🇹🇪"]
-
+    userIMG = interaction.user.display_avatar
+    userName = interaction.user.display_name
     embed = discord.Embed(
         title='Hangman',
         colour=0xff0000
+
     )
+
+    embed.set_author(name=userName, icon_url=userIMG)
+
     await interaction.response.send_message("Playing: Hangman")
 
     a = '🇦'
@@ -353,13 +358,19 @@ async def hangman(interaction):
         displayGuesses = ""
         for z in range(0, len(guesses)):
             displayGuesses += guesses[z] + " "
+        embed = discord.Embed(
+            title='Hangman',
+            colour=0xff0000
 
+        )
+
+        embed.set_author(name=userName, icon_url=userIMG)
         embed.add_field(name="Lives Remaining: " + str(lives - incorrect) + " ♥♥♥♥",
                         value='```      ------------------ \n      |        |       \n      |             \n      |             \n      |             \n      |             \n     ___           ```')
         embed.add_field(name="Progress: ", value="```" + displayGuesses + "```", inline=False)
         embed.set_footer(text="Make a guess by reacting to this message.")
 
-        await interaction.followup.send(embed=embed)
+        await interaction.edit_original_response(embed=embed)
         embed.remove_field(0)
         embed.remove_field(0)
         embed.remove_footer()
@@ -374,21 +385,41 @@ async def hangman(interaction):
                 for x in range(0, len(wordArr)):
                     if wordArr[x] == guess1:
                         guesses[x] = guess1
-                await interaction.followup.send(":white_check_mark: Correct Guess :white_check_mark:")
+                embed.title = ":white_check_mark: Correct Guess :white_check_mark:"
+                embed.add_field(name="Lives Remaining: " + str(lives - incorrect) + " ♥♥♥♥",
+                                value='```      ------------------ \n      |        |       \n      |             \n      |             \n      |             \n      |             \n     ___           ```')
+                embed.add_field(name="Progress: ", value="```" + displayGuesses + "```", inline=False)
+                embed.colour = discord.Colour.green()
+                await interaction.edit_original_response(embed=embed)
+                await asyncio.sleep(0.3)
             else:
-                await interaction.followup.send(":x: Incorrect Guess :x:")
+                embed.title = ":x: Incorrect Guess :x:"
+                embed.add_field(name="Lives Remaining: " + str(lives - incorrect) + " ♥♥♥♥",
+                                value='```      ------------------ \n      |        |       \n      |             \n      |             \n      |             \n      |             \n     ___           ```')
+                embed.add_field(name="Progress: ", value="```" + displayGuesses + "```", inline=False)
+                await interaction.edit_original_response(embed=embed)
+                await asyncio.sleep(0.3)
                 used.append(guess1)
                 incorrect += 1
             if guesses == wordArr:
                 embed.remove_footer()
+                embed.remove_field(0)
+                embed.remove_field(0)
+                displayGuesses = " ".join(wordArr)
                 embed.set_footer(text="The word was: " + theWord)
-                await interaction.followup.send(":trophy: WINNER :trophy:")
+                embed.title= ":trophy: WINNER :trophy:"
+                embed.add_field(name="Lives Remaining: " + str(lives - incorrect) + " ♥♥♥♥",
+                                value='```      ------------------ \n      |        |       \n      |             \n      |             \n      |             \n      |             \n     ___           ```')
+                embed.add_field(name="Progress: ", value="```" + displayGuesses + "```", inline=False)
+                embed.colour = discord.Colour.yellow()
+                await interaction.edit_original_response(embed=embed)
                 stopper = 1
-                break
+
         else:
-            await interaction.followup.send(":x: Incorrect Reaction Type (Must be a letter) :x:")
+            await interaction.followup.send(":x: Incorrect Reaction Type (Must be a letter) :x:", ephemeral=True)
         if incorrect == 1:
             while stopper == 0:
+
                 displayGuesses = ""
                 for z in range(0, len(guesses)):
                     displayGuesses += guesses[z] + " "
@@ -396,6 +427,7 @@ async def hangman(interaction):
                     title="Hangman",
                     colour=0xad0000
                 )
+                embed.set_author(name=userName, icon_url=userIMG)
                 displayUsed = ""
                 for i in range(0, len(used)):
                     displayUsed += used[i] + ", "
@@ -405,7 +437,7 @@ async def hangman(interaction):
                 embed.add_field(name="Incorrect: ", value="```" + displayUsed + "```", inline=False)
                 embed.set_footer(text="Make a guess by reacting to this message.")
 
-                await interaction.followup.send(embed=embed)
+                await interaction.edit_original_response(embed=embed)
                 embed.remove_field(0)
                 embed.remove_field(0)
                 embed.remove_field(0)
@@ -421,26 +453,45 @@ async def hangman(interaction):
                         for x in range(0, len(wordArr)):
                             if wordArr[x] == guess1:
                                 guesses[x] = guess1
-                        await interaction.followup.send(":white_check_mark: Correct Guess :white_check_mark:")
+                        embed.title = ":white_check_mark: Correct Guess :white_check_mark:"
+                        embed.add_field(name="Lives Remaining: " + str(lives - incorrect) + " ♥♥♥🖤",
+                                        value='```      ------------------ \n      |        |       \n      |        O    \n      |             \n      |             \n      |             \n     ___           ```')
+                        embed.add_field(name="Progress: ", value="```" + displayGuesses + "```", inline=False)
+                        embed.add_field(name="Incorrect: ", value="```" + displayUsed + "```", inline=False)
+                        embed.colour = discord.Colour.green()
+                        await interaction.edit_original_response(embed=embed)
+                        await asyncio.sleep(0.3)
                     else:
                         used.append(guess1)
                         incorrect += 1
-                        await interaction.followup.send(":x: Incorrect Guess :x:")
+                        embed.title = ":x: Incorrect Guess :x:"
+                        embed.add_field(name="Lives Remaining: " + str(lives - incorrect) + " ♥♥♥🖤",
+                                        value='```      ------------------ \n      |        |       \n      |        O    \n      |             \n      |             \n      |             \n     ___           ```')
+                        embed.add_field(name="Progress: ", value="```" + displayGuesses + "```", inline=False)
+                        embed.add_field(name="Incorrect: ", value="```" + displayUsed + "```", inline=False)
+
+                        await interaction.edit_original_response(embed=embed)
+                        await asyncio.sleep(0.3)
 
                     if guesses == wordArr:
                         embed.remove_footer()
                         embed.set_footer(text="The word was: " + theWord)
-                        await interaction.followup.send(":trophy: WINNER :trophy:")
+                        embed.title = ":trophy: WINNER :trophy:"
+                        embed.colour = discord.Colour.yellow()
+
+                        await interaction.edit_original_response(embed=embed)
                         stopper = 1
                         break
                 else:
-                    await interaction.followup.send(":x: Incorrect Reaction Type (Must be a letter) :x:")
+                    await interaction.followup.send(":x: Incorrect Reaction Type (Must be a letter) :x:", ephemeral=True)
                 if incorrect == 2:
                     while stopper == 0:
+
                         embed = discord.Embed(
                             title="Hangman",
                             colour=0x850000
                         )
+                        embed.set_author(name=userName, icon_url=userIMG)
                         displayGuesses = ""
                         for z in range(0, len(guesses)):
                             displayGuesses += guesses[z] + " "
@@ -454,7 +505,7 @@ async def hangman(interaction):
                         embed.add_field(name="Incorrect: ", value="```" + displayUsed + "```", inline=False)
                         embed.set_footer(text="Make a guess by reacting to this message.")
 
-                        await interaction.followup.send(embed=embed)
+                        await interaction.edit_original_response(embed=embed)
                         embed.remove_field(0)
                         embed.remove_field(0)
                         embed.remove_field(0)
@@ -470,26 +521,46 @@ async def hangman(interaction):
                                 for x in range(0, len(wordArr)):
                                     if wordArr[x] == guess1:
                                         guesses[x] = guess1
-                                await interaction.followup.send(":white_check_mark: Correct Guess :white_check_mark:")
+                                embed.title = ":white_check_mark: Correct Guess :white_check_mark:"
+                                embed.add_field(name="Lives Remaining: " + str(lives - incorrect) + " ♥♥🖤🖤",
+                                                value='```      ------------------ \n      |        |       \n      |        O    \n      |       /|\   \n      |             \n      |             \n     ___           ```')
+                                embed.add_field(name="Progress: ", value="```" + displayGuesses + "```", inline=False)
+                                embed.add_field(name="Incorrect: ", value="```" + displayUsed + "```", inline=False)
+                                embed.colour = discord.Colour.green()
+                                await interaction.edit_original_response(embed=embed)
+                                await asyncio.sleep(0.3)
                             else:
                                 used.append(guess1)
                                 incorrect += 1
-                                await interaction.followup.send(":x: Incorrect Guess :x:")
+                                embed.title = ":x: Incorrect Guess :x:"
+                                embed.add_field(name="Lives Remaining: " + str(lives - incorrect) + " ♥♥🖤🖤",
+                                                value='```      ------------------ \n      |        |       \n      |        O    \n      |       /|\   \n      |             \n      |             \n     ___           ```')
+                                embed.add_field(name="Progress: ", value="```" + displayGuesses + "```", inline=False)
+                                embed.add_field(name="Incorrect: ", value="```" + displayUsed + "```", inline=False)
+                                await interaction.edit_original_response(embed=embed)
+                                await asyncio.sleep(0.3)
 
                             if guesses == wordArr:
                                 embed.remove_footer()
                                 embed.set_footer(text="The word was: " + theWord)
-                                await interaction.followup.send(":trophy: WINNER :trophy:")
+                                embed.title = ":trophy: WINNER :trophy:"
+                                embed.colour = discord.Colour.yellow()
+                                embed.add_field(name="Lives Remaining: " + str(lives - incorrect) + " ♥♥🖤🖤",
+                                                value='```      ------------------ \n      |        |       \n      |        O    \n      |       /|\   \n      |             \n      |             \n     ___           ```')
+                                embed.add_field(name="Progress: ", value="```" + displayGuesses + "```", inline=False)
+                                embed.add_field(name="Incorrect: ", value="```" + displayUsed + "```", inline=False)
+                                await interaction.edit_original_response(embed=embed)
                                 stopper = 1
                                 break
                         else:
-                            await interaction.followup.send(":x: Incorrect Reaction Type (Must be a letter) :x:")
+                            await interaction.followup.send(":x: Incorrect Reaction Type (Must be a letter) :x:", ephemeral=True)
                         if incorrect == 3:
                             while stopper == 0:
                                 embed = discord.Embed(
                                     title="Hangman",
                                     colour=0x380000
                                 )
+                                embed.set_author(name=userName, icon_url=userIMG)
                                 displayGuesses = ""
                                 for z in range(0, len(guesses)):
                                     displayGuesses += guesses[z] + " "
@@ -503,7 +574,7 @@ async def hangman(interaction):
                                 embed.add_field(name="Incorrect: ", value="```" + displayUsed + "```", inline=False)
                                 embed.set_footer(text="Make a guess by reacting to this message.")
 
-                                await interaction.followup.send(embed=embed)
+                                await interaction.edit_original_response(embed=embed)
                                 embed.remove_field(0)
                                 embed.remove_field(0)
                                 embed.remove_field(0)
@@ -519,28 +590,53 @@ async def hangman(interaction):
                                         for x in range(0, len(wordArr)):
                                             if wordArr[x] == guess1:
                                                 guesses[x] = guess1
-                                        await interaction.followup.send(
-                                            ":white_check_mark: Correct Guess :white_check_mark:")
+                                        embed.title = ":white_check_mark: Correct Guess :white_check_mark:"
+                                        embed.add_field(name="Lives Remaining: " + str(lives - incorrect) + " ♥🖤🖤🖤",
+                                                        value='```      ------------------ \n      |        |       \n      |        O    \n      |       /|\   \n      |       /     \n      |             \n     ___           ```')
+                                        embed.add_field(name="Progress: ", value="```" + displayGuesses + "```",
+                                                        inline=False)
+                                        embed.add_field(name="Incorrect: ", value="```" + displayUsed + "```",
+                                                        inline=False)
+                                        embed.colour = discord.Colour.green()
+                                        await interaction.edit_original_response(embed=embed)
+                                        await asyncio.sleep(0.3)
                                     else:
                                         used.append(guess1)
                                         incorrect += 1
-                                        await interaction.followup.send(":x: Incorrect Guess :x:")
+                                        embed.title = ":x: Incorrect Guess :x:"
+                                        embed.add_field(name="Lives Remaining: " + str(lives - incorrect) + " ♥🖤🖤🖤",
+                                                        value='```      ------------------ \n      |        |       \n      |        O    \n      |       /|\   \n      |       /     \n      |             \n     ___           ```')
+                                        embed.add_field(name="Progress: ", value="```" + displayGuesses + "```",
+                                                        inline=False)
+                                        embed.add_field(name="Incorrect: ", value="```" + displayUsed + "```",
+                                                        inline=False)
+                                        await interaction.edit_original_response(embed=embed)
+                                        await asyncio.sleep(0.3)
 
                                     if guesses == wordArr:
                                         embed.remove_footer()
                                         embed.set_footer(text="The word was: " + theWord)
-                                        await interaction.followup.send(":trophy: WINNER :trophy:")
+                                        embed.title = ":trophy: WINNER :trophy:"
+                                        embed.colour = discord.Colour.yellow()
+                                        embed.add_field(name="Lives Remaining: " + str(lives - incorrect) + " ♥🖤🖤🖤",
+                                                        value='```      ------------------ \n      |        |       \n      |        O    \n      |       /|\   \n      |       /     \n      |             \n     ___           ```')
+                                        embed.add_field(name="Progress: ", value="```" + displayGuesses + "```",
+                                                        inline=False)
+                                        embed.add_field(name="Incorrect: ", value="```" + displayUsed + "```",
+                                                        inline=False)
+                                        await interaction.edit_original_response(embed=embed)
                                         stopper = 1
                                         break
                                 else:
                                     await interaction.followup.send(
-                                        ":x: Incorrect Reaction Type (Must be a letter) :x:")
+                                        ":x: Incorrect Reaction Type (Must be a letter) :x:", ephemeral=True)
                                 if incorrect == 4:
                                     while stopper == 0:
                                         embed = discord.Embed(
                                             title="Hangman",
                                             colour=0x000000
                                         )
+                                        embed.set_author(name=userName, icon_url=userIMG)
                                         displayGuesses = ""
                                         for z in range(0, len(guesses)):
                                             displayGuesses += guesses[z] + " "
@@ -556,11 +652,10 @@ async def hangman(interaction):
                                                         inline=False)
                                         embed.set_footer(text="The word was: " + theWord)
 
-                                        await interaction.followup.send(embed=embed)
+                                        await interaction.edit_original_response(embed=embed)
 
                                         stopper = 1
                                         break
-
 '''
 import time
 from pprint import pprint
