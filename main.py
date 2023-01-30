@@ -1,4 +1,3 @@
-
 import io
 import urllib.request
 import PIL
@@ -1992,4 +1991,5 @@ async def lu(interaction: discord.Interaction, location: str):
     except IndexError:
         await interaction.response.send_message(embed=error, ephemeral=True)
 
+        
 client.run(TOKEN)
